@@ -95,6 +95,8 @@ Password: password123
 
 The login form is **pre-filled** with `user1@test.com` / `password123`, so you can simply tap **Login** to get started.
 
+> Prefer to make your own account? Tap **Sign up** on the login screen to register a new user (see the Registration feature below). New accounts live in memory and reset when the app restarts.
+
 | Email | Password | Name |
 | --- | --- | --- |
 | `user1@test.com` | `password123` | Aiko Tanaka |
@@ -115,6 +117,7 @@ Each seller owns a slice of the seeded listings, so logging in as different user
 ## Features
 
 - **Login / Logout** — Email + password authentication against the seeded sample users, with an inline error for invalid credentials. Log out from the Profile tab.
+- **Registration** — Create a new account from the login screen's **Sign up** link. The form captures name, email, password (with confirmation) and an optional bio, validates the input (required fields, email format, minimum password length, and duplicate-email check), then signs the new user in automatically.
 - **Home / Browse Listings** — A two-column grid of ~50 seeded items (sneakers, electronics, home goods, books, beauty, and more), each showing photo, title, and price.
 - **Search** — Filter listings live by title from the search bar; an empty state appears when nothing matches.
 - **Product Detail** — Tap any item to see its photo, price, condition, category, description, and the seller. Items that are no longer available show a **SOLD** badge.
