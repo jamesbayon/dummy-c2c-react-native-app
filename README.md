@@ -155,6 +155,60 @@ npm test         # Run Jest tests
 
 ---
 
+## End-to-End Testing (Detox)
+
+The app has an end-to-end test suite built with **[Detox](https://wix.github.io/Detox/)** (gray-box E2E for React Native) using **Jest** as the runner. Tests drive the real app on the iOS Simulator through stable `testID` selectors.
+
+> Current coverage: a sample **Login happy-path** test (`e2e/login.test.js`). More flows (registration, listing creation, etc.) will be added incrementally.
+
+### What you need to install
+
+| Tool | How |
+| --- | --- |
+| **Detox** (dev dependency) | Already in `devDependencies` — installed via `npm install`. It was added with `npm install --save-dev detox`. |
+| **applesimutils** | Detox uses it to control the iOS Simulator: `brew tap wix/brew && brew install applesimutils` |
+| **Xcode + a booted iOS Simulator** | Same as for running the app (see Prerequisites above). |
+
+### What was configured (and what was *not*)
+
+- **`.detoxrc.js`** — Detox configuration. The `ios.sim.debug` config builds the existing **`MercariClone`** Xcode scheme/workspace into `ios/build` and targets an **iPhone 17 Pro** simulator. (The Xcode scheme/target name is still `MercariClone` internally; the user-facing app name is **C2C Marketplace** via `CFBundleDisplayName`.)
+- **`e2e/jest.config.js`** — Jest runner wired to Detox's `globalSetup`/`globalTeardown`, `testEnvironment`, and reporter, with `maxWorkers: 1`.
+- **`e2e/login.test.js`** — the test spec.
+- **No native/Podfile changes were required.** Detox 20.x injects its own prebuilt test framework into the app at launch (cached under `~/Library/Detox`), so the app's `Podfile` is untouched and you do **not** need to add a Detox pod.
+
+The suite relies on these existing `testID`s: `email-input`, `password-input`, `login-button`, and the bottom-tab buttons `tab-home` / `tab-sell` / `tab-favorites` / `tab-profile`.
+
+### Running the tests
+
+> The iOS **debug** build loads its JS bundle from Metro, so **Metro must be running** (`npm start`) in a separate terminal before you run the tests.
+
+```sh
+# 1. Start Metro (separate terminal, if not already running)
+npm start
+
+# 2. Build the app for Detox (once per native/JS-config change)
+npm run e2e:build      # = detox build --configuration ios.sim.debug
+
+# 3. Run the E2E tests
+npm run e2e:test       # = detox test --configuration ios.sim.debug
+
+# Run a single spec while iterating
+npx detox test --configuration ios.sim.debug e2e/login.test.js
+```
+
+Expected result:
+
+```
+PASS e2e/login.test.js
+  Authentication - Login
+    ✓ logs in an existing user with valid credentials and lands on Home
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+```
+
+---
+
 ## Troubleshooting
 
 - **Build / red error screen after first clone** — Make sure `npm install` and `bundle exec pod install` both completed, then restart Metro with a clean cache: `npm start -- --reset-cache`.
