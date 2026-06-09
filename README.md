@@ -20,14 +20,14 @@ A consumer-to-consumer (C2C) marketplace mobile app built with **React Native**.
 
 Make sure the following are installed before you start. If you're new to React Native, follow the official [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide first.
 
-| Tool | Notes |
-| --- | --- |
-| **Node.js** | v20+ (the project's `package.json` recommends `>= 22.11.0`) |
-| **npm** | Comes with Node |
-| **Watchman** | Recommended on macOS: `brew install watchman` |
-| **Ruby + Bundler** | Used to install CocoaPods (`gem install bundler`) |
-| **CocoaPods** | Installed via Bundler (see below) |
-| **Xcode** | 15+ with Command Line Tools, for the iOS Simulator |
+| Tool               | Notes                                                       |
+| ------------------ | ----------------------------------------------------------- |
+| **Node.js**        | v20+ (the project's `package.json` recommends `>= 22.11.0`) |
+| **npm**            | Comes with Node                                             |
+| **Watchman**       | Recommended on macOS: `brew install watchman`               |
+| **Ruby + Bundler** | Used to install CocoaPods (`gem install bundler`)           |
+| **CocoaPods**      | Installed via Bundler (see below)                           |
+| **Xcode**          | 15+ with Command Line Tools, for the iOS Simulator          |
 
 > **iOS only.** These instructions cover running the app on the iOS Simulator (macOS). The project also contains an Android project, but it has not been verified here.
 
@@ -97,18 +97,18 @@ The login form is **pre-filled** with `user1@test.com` / `password123`, so you c
 
 > Prefer to make your own account? Tap **Sign up** on the login screen to register a new user (see the Registration feature below). New accounts live in memory and reset when the app restarts.
 
-| Email | Password | Name |
-| --- | --- | --- |
-| `user1@test.com` | `password123` | Aiko Tanaka |
-| `user2@test.com` | `password123` | Kenji Sato |
-| `user3@test.com` | `password123` | Mina Kobayashi |
-| `user4@test.com` | `password123` | Haru Suzuki |
-| `user5@test.com` | `password123` | Yui Nakamura |
-| `user6@test.com` | `password123` | Riku Ito |
-| `user7@test.com` | `password123` | Sora Watanabe |
-| `user8@test.com` | `password123` | Emi Yamamoto |
-| `user9@test.com` | `password123` | Daichi Mori |
-| `user10@test.com` | `password123` | Nana Hayashi |
+| Email             | Password      | Name           |
+| ----------------- | ------------- | -------------- |
+| `user1@test.com`  | `password123` | Aiko Tanaka    |
+| `user2@test.com`  | `password123` | Kenji Sato     |
+| `user3@test.com`  | `password123` | Mina Kobayashi |
+| `user4@test.com`  | `password123` | Haru Suzuki    |
+| `user5@test.com`  | `password123` | Yui Nakamura   |
+| `user6@test.com`  | `password123` | Riku Ito       |
+| `user7@test.com`  | `password123` | Sora Watanabe  |
+| `user8@test.com`  | `password123` | Emi Yamamoto   |
+| `user9@test.com`  | `password123` | Daichi Mori    |
+| `user10@test.com` | `password123` | Nana Hayashi   |
 
 Each seller owns a slice of the seeded listings, so logging in as different users (and viewing their seller profiles) shows different inventories.
 
@@ -151,32 +151,69 @@ npm run ios      # Build & run on the iOS Simulator
 npm run android  # Build & run on Android
 npm run lint     # Run ESLint
 npm test         # Run Jest tests
+npm run e2e:build # Build the iOS app for Detox
+npm run e2e:test  # Run Detox E2E tests on the iOS Simulator
 ```
 
 ---
 
 ## End-to-End Testing (Detox)
 
-The app has an end-to-end test suite built with **[Detox](https://wix.github.io/Detox/)** (gray-box E2E for React Native) using **Jest** as the runner. Tests drive the real app on the iOS Simulator through stable `testID` selectors.
+The app has an end-to-end test suite built with **[Detox](https://wix.github.io/Detox/)** (gray-box E2E for React Native) using **Jest** as the runner. Tests drive the real app on the iOS Simulator through stable `testID` selectors and page-object helpers.
 
-> Current coverage: a sample **Login happy-path** test (`e2e/login.test.js`). More flows (registration, listing creation, etc.) will be added incrementally.
+Current verified coverage: **4 Detox suites, 34 tests passing** on iOS Simulator (`ios.sim.debug`, iPhone 17 Pro).
+
+For the full living strategy, prioritization matrix, feature-level coverage, review gaps, issues found, and final run log, see [`TEST_STRATEGY.md`](./TEST_STRATEGY.md).
+
+### Test strategy summary
+
+The suite is risk-based:
+
+- **P0** protects flows that can block marketplace use or growth: login/logout, registration, and creating a listing.
+- **P1** covers buyer discovery and trust: browse/search, product detail, sold state, and favorites.
+- **P2** covers supporting trust/account/navigation flows: seller profiles, profile display, and bottom tab smoke.
+
+ISTQB techniques used include use-case testing for real journeys, equivalence partitioning for valid/invalid input classes, boundary value analysis around password and price inputs, decision tables for validation-heavy forms, and state-transition testing for login/logout and favorite/unfavorite behavior.
+
+### Coverage by feature
+
+| Feature               | Spec                            | Coverage summary                                                                                                                                                                                                          |
+| --------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login / Logout        | `e2e/auth-login.test.js`        | Valid seeded login, wrong password, wrong-case password, unknown user, malformed email, empty fields, single-empty-field partitions, email trim/case normalization, logout state transition.                              |
+| Registration          | `e2e/auth-registration.test.js` | Valid registration with auto-login, password min boundary, below-min rejection, duplicate email, password mismatch, missing required fields, invalid email, new account logout/relogin within the same in-memory session. |
+| Create Listing        | `e2e/sell-listing.test.js`      | Valid listing appears in Home, empty-form validation, missing-title validation, non-numeric price rejection, zero-price boundary/current behavior.                                                                        |
+| Browse / Search       | `e2e/marketplace-core.test.js`  | Seeded grid title/price/sold badge, partial search, clear search restore, no-match/special-character empty state.                                                                                                         |
+| Product Detail / Sold | `e2e/marketplace-core.test.js`  | Detail title, price, condition, seller, and sold banner for sold listings.                                                                                                                                                |
+| Favorites             | `e2e/marketplace-core.test.js`  | Favorite from Home, Favorites tab population, unfavorite back to empty, detail-to-Favorites state consistency.                                                                                                            |
+| Seller Profile        | `e2e/marketplace-core.test.js`  | Open seller from product detail, verify seller name/join date and listing presence.                                                                                                                                       |
+| Profile / Navigation  | `e2e/marketplace-core.test.js`  | Bottom tab smoke for Sell/Profile/Home and logged-in profile name/email.                                                                                                                                                  |
+
+### Issues found and resolved
+
+- **Ambiguous price assertion**: a created listing price matched seeded data. Resolved by asserting the unique created listing title instead of ambiguous price text.
+- **Keyboard/tab hittability**: bottom tab assertions could fail when the keyboard or safe-area frame affected visibility. Resolved by waiting for the Home search input as the authenticated landing signal and removing unnecessary tab round-trips.
+- **Offscreen seller button**: the "View Seller Profile" button was below the product detail fold. Resolved by adding `product-seller-row` and tapping the visible seller row.
+- **Detox selector gaps**: added additive `testID`s for listing title/price, Sell form errors, seller/profile metadata, and seller-row navigation.
+- **Jest unit config**: plain unit Jest was picking up Detox specs without Detox globals. Resolved by excluding `e2e/` from the root Jest config; Detox uses `e2e/jest.config.js`.
 
 ### What you need to install
 
-| Tool | How |
-| --- | --- |
-| **Detox** (dev dependency) | Already in `devDependencies` — installed via `npm install`. It was added with `npm install --save-dev detox`. |
-| **applesimutils** | Detox uses it to control the iOS Simulator: `brew tap wix/brew && brew install applesimutils` |
-| **Xcode + a booted iOS Simulator** | Same as for running the app (see Prerequisites above). |
+| Tool                               | How                                                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Detox** (dev dependency)         | Already in `devDependencies` — installed via `npm install`. It was added with `npm install --save-dev detox`. |
+| **applesimutils**                  | Detox uses it to control the iOS Simulator: `brew tap wix/brew && brew install applesimutils`                 |
+| **Xcode + a booted iOS Simulator** | Same as for running the app (see Prerequisites above).                                                        |
 
-### What was configured (and what was *not*)
+### What was configured (and what was _not_)
 
 - **`.detoxrc.js`** — Detox configuration. The `ios.sim.debug` config builds the existing **`MercariClone`** Xcode scheme/workspace into `ios/build` and targets an **iPhone 17 Pro** simulator. (The Xcode scheme/target name is still `MercariClone` internally; the user-facing app name is **C2C Marketplace** via `CFBundleDisplayName`.)
 - **`e2e/jest.config.js`** — Jest runner wired to Detox's `globalSetup`/`globalTeardown`, `testEnvironment`, and reporter, with `maxWorkers: 1`.
-- **`e2e/login.test.js`** — the test spec.
+- **`e2e/*.test.js`** — feature specs for auth, registration, sell listing, and marketplace core flows.
+- **`e2e/screens/index.js`** — page-object helpers for stable Detox selectors.
+- **`e2e/support/*`** — seeded fixture constants and reusable flows.
 - **No native/Podfile changes were required.** Detox 20.x injects its own prebuilt test framework into the app at launch (cached under `~/Library/Detox`), so the app's `Podfile` is untouched and you do **not** need to add a Detox pod.
 
-The suite relies on these existing `testID`s: `email-input`, `password-input`, `login-button`, and the bottom-tab buttons `tab-home` / `tab-sell` / `tab-favorites` / `tab-profile`.
+The suite relies on stable `testID`s across login, registration, tabs, listings, product detail, Sell, Favorites, Seller Profile, and Profile. The full selector inventory is documented in [`TEST_STRATEGY.md`](./TEST_STRATEGY.md).
 
 ### Running the tests
 
@@ -193,18 +230,17 @@ npm run e2e:build      # = detox build --configuration ios.sim.debug
 npm run e2e:test       # = detox test --configuration ios.sim.debug
 
 # Run a single spec while iterating
-npx detox test --configuration ios.sim.debug e2e/login.test.js
+npx detox test --configuration ios.sim.debug e2e/auth-login.test.js
+npx detox test --configuration ios.sim.debug e2e/auth-registration.test.js
+npx detox test --configuration ios.sim.debug e2e/sell-listing.test.js
+npx detox test --configuration ios.sim.debug e2e/marketplace-core.test.js
 ```
 
-Expected result:
+Latest verified result:
 
 ```
-PASS e2e/login.test.js
-  Authentication - Login
-    ✓ logs in an existing user with valid credentials and lands on Home
-
-Test Suites: 1 passed, 1 total
-Tests:       1 passed, 1 total
+Test Suites: 4 passed, 4 total
+Tests:       34 passed, 34 total
 ```
 
 ---
