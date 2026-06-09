@@ -1,18 +1,18 @@
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import {useAuth} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export function ProfileScreen() {
   const navigation = useNavigation();
-  const {currentUser, logout} = useAuth();
+  const { currentUser, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigation.getParent()?.reset({
       index: 0,
-      routes: [{name: 'Login' as never}],
+      routes: [{ name: 'Login' as never }],
     });
   };
 
@@ -23,17 +23,26 @@ export function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.profile}>
-        <Image source={{uri: currentUser.avatar}} style={styles.avatar} />
-        <Text style={styles.name}>{currentUser.name}</Text>
-        <Text style={styles.email}>{currentUser.email}</Text>
-        <Text style={styles.joined}>{currentUser.joinedDate}</Text>
-        <Text style={styles.bio}>{currentUser.bio}</Text>
+        <Image source={{ uri: currentUser.avatar }} style={styles.avatar} />
+        <Text testID="profile-name" style={styles.name}>
+          {currentUser.name}
+        </Text>
+        <Text testID="profile-email" style={styles.email}>
+          {currentUser.email}
+        </Text>
+        <Text testID="profile-joined-date" style={styles.joined}>
+          {currentUser.joinedDate}
+        </Text>
+        <Text testID="profile-bio" style={styles.bio}>
+          {currentUser.bio}
+        </Text>
       </View>
       <TouchableOpacity
         testID="logout-button"
         accessibilityRole="button"
         onPress={handleLogout}
-        style={styles.logoutButton}>
+        style={styles.logoutButton}
+      >
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>

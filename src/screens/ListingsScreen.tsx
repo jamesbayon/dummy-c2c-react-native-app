@@ -33,6 +33,7 @@ export function ListingsScreen({navigation}: Props) {
     <View style={styles.screen}>
       <SearchBar value={search} onChangeText={setSearch} />
       <FlatList
+        testID="listings-list"
         data={filteredListings}
         keyExtractor={item => item.id}
         numColumns={2}

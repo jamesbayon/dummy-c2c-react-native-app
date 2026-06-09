@@ -8,16 +8,16 @@ import {
   View,
 } from 'react-native';
 
-import {useFavorites} from '../context/FavoritesContext';
-import type {Listing} from '../types';
+import { useFavorites } from '../context/FavoritesContext';
+import type { Listing } from '../types';
 
 type ListingCardProps = {
   listing: Listing;
   onPress: (listing: Listing) => void;
 };
 
-export function ListingCard({listing, onPress}: ListingCardProps) {
-  const {isFavorite, toggleFavorite} = useFavorites();
+export function ListingCard({ listing, onPress }: ListingCardProps) {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listing.id);
 
   return (
@@ -25,9 +25,10 @@ export function ListingCard({listing, onPress}: ListingCardProps) {
       testID={`listing-card-${listing.id}`}
       accessibilityRole="button"
       onPress={() => onPress(listing)}
-      style={styles.card}>
+      style={styles.card}
+    >
       <View style={styles.imageWrap}>
-        <Image source={{uri: listing.images[0]}} style={styles.image} />
+        <Image source={{ uri: listing.images[0] }} style={styles.image} />
         {listing.isSold ? (
           <View testID={`sold-badge-${listing.id}`} style={styles.soldBadge}>
             <Text style={styles.soldText}>SOLD</Text>
@@ -40,17 +41,24 @@ export function ListingCard({listing, onPress}: ListingCardProps) {
             event.stopPropagation();
             toggleFavorite(listing.id);
           }}
-          style={styles.favoriteButton}>
+          style={styles.favoriteButton}
+        >
           <Text style={[styles.heart, favorite && styles.heartActive]}>
             {favorite ? '♥' : '♡'}
           </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        <Text numberOfLines={2} style={styles.title}>
+        <Text
+          testID={`listing-title-${listing.id}`}
+          numberOfLines={2}
+          style={styles.title}
+        >
           {listing.title}
         </Text>
-        <Text style={styles.price}>¥{listing.price.toLocaleString()}</Text>
+        <Text testID={`listing-price-${listing.id}`} style={styles.price}>
+          ¥{listing.price.toLocaleString()}
+        </Text>
       </View>
     </Pressable>
   );
@@ -65,7 +73,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     elevation: 2,
     overflow: 'hidden',
   },

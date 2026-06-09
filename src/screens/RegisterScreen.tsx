@@ -45,7 +45,10 @@ export function RegisterScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        testID="register-scroll"
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled">
         <Text style={styles.logo}>Create Account</Text>
 
         <TextInput

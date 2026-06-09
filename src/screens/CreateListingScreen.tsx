@@ -1,6 +1,6 @@
-import {CommonActions, useNavigation} from '@react-navigation/native';
-import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import React, {useState} from 'react';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,17 +12,19 @@ import {
   View,
 } from 'react-native';
 
-import {useAuth} from '../context/AuthContext';
-import {useListings} from '../context/ListingsContext';
-import type {Category, ListingCondition, MainTabParamList} from '../types';
-import {categories, conditions} from '../types';
+import { useAuth } from '../context/AuthContext';
+import { useListings } from '../context/ListingsContext';
+import type { Category, ListingCondition, MainTabParamList } from '../types';
+import { categories, conditions } from '../types';
 
-type FormErrors = Partial<Record<'title' | 'price' | 'category' | 'condition', string>>;
+type FormErrors = Partial<
+  Record<'title' | 'price' | 'category' | 'condition', string>
+>;
 
 export function CreateListingScreen() {
   const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
-  const {currentUser} = useAuth();
-  const {addListing} = useListings();
+  const { currentUser } = useAuth();
+  const { addListing } = useListings();
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState<Category | ''>('');
@@ -87,12 +89,12 @@ export function CreateListingScreen() {
             name: 'Home',
             state: {
               index: 0,
-              routes: [{name: 'Listings'}],
+              routes: [{ name: 'Listings' }],
             },
           },
-          {name: 'Sell'},
-          {name: 'Favorites'},
-          {name: 'Profile'},
+          { name: 'Sell' },
+          { name: 'Favorites' },
+          { name: 'Profile' },
         ],
       }),
     );
@@ -101,8 +103,13 @@ export function CreateListingScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      style={styles.screen}
+    >
+      <ScrollView
+        testID="create-listing-scroll"
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <TouchableOpacity accessibilityRole="button" style={styles.photoBox}>
           <Text style={styles.photoText}>Add Photo</Text>
         </TouchableOpacity>
@@ -113,13 +120,17 @@ export function CreateListingScreen() {
           value={title}
           onChangeText={value => {
             setTitle(value);
-            setErrors(current => ({...current, title: undefined}));
+            setErrors(current => ({ ...current, title: undefined }));
           }}
           placeholder="What are you selling?"
           placeholderTextColor="#8E8E93"
           style={styles.input}
         />
-        {errors.title ? <Text style={styles.error}>{errors.title}</Text> : null}
+        {errors.title ? (
+          <Text testID="listing-title-error" style={styles.error}>
+            {errors.title}
+          </Text>
+        ) : null}
 
         <Text style={styles.label}>Price</Text>
         <TextInput
@@ -127,41 +138,50 @@ export function CreateListingScreen() {
           value={price}
           onChangeText={value => {
             setPrice(value.replace(/[^0-9]/g, ''));
-            setErrors(current => ({...current, price: undefined}));
+            setErrors(current => ({ ...current, price: undefined }));
           }}
           keyboardType="numeric"
           placeholder="¥0"
           placeholderTextColor="#8E8E93"
           style={styles.input}
         />
-        {errors.price ? <Text style={styles.error}>{errors.price}</Text> : null}
+        {errors.price ? (
+          <Text testID="listing-price-error" style={styles.error}>
+            {errors.price}
+          </Text>
+        ) : null}
 
         <Text style={styles.label}>Category</Text>
         <View style={styles.optionGrid}>
           {categories.map(option => (
             <TouchableOpacity
               key={option}
+              testID={`category-option-${option}`}
               accessibilityRole="button"
               onPress={() => {
                 setCategory(option);
-                setErrors(current => ({...current, category: undefined}));
+                setErrors(current => ({ ...current, category: undefined }));
               }}
               style={[
                 styles.option,
                 category === option && styles.optionSelected,
-              ]}>
+              ]}
+            >
               <Text
                 style={[
                   styles.optionText,
                   category === option && styles.optionTextSelected,
-                ]}>
+                ]}
+              >
                 {option}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
         {errors.category ? (
-          <Text style={styles.error}>{errors.category}</Text>
+          <Text testID="listing-category-error" style={styles.error}>
+            {errors.category}
+          </Text>
         ) : null}
 
         <Text style={styles.label}>Condition</Text>
@@ -169,27 +189,32 @@ export function CreateListingScreen() {
           {conditions.map(option => (
             <TouchableOpacity
               key={option}
+              testID={`condition-option-${option}`}
               accessibilityRole="button"
               onPress={() => {
                 setCondition(option);
-                setErrors(current => ({...current, condition: undefined}));
+                setErrors(current => ({ ...current, condition: undefined }));
               }}
               style={[
                 styles.option,
                 condition === option && styles.optionSelected,
-              ]}>
+              ]}
+            >
               <Text
                 style={[
                   styles.optionText,
                   condition === option && styles.optionTextSelected,
-                ]}>
+                ]}
+              >
                 {option}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
         {errors.condition ? (
-          <Text style={styles.error}>{errors.condition}</Text>
+          <Text testID="listing-condition-error" style={styles.error}>
+            {errors.condition}
+          </Text>
         ) : null}
 
         <Text style={styles.label}>Description</Text>
@@ -208,7 +233,8 @@ export function CreateListingScreen() {
           testID="listing-submit-button"
           accessibilityRole="button"
           onPress={handleSubmit}
-          style={styles.submitButton}>
+          style={styles.submitButton}
+        >
           <Text style={styles.submitText}>List Item</Text>
         </TouchableOpacity>
       </ScrollView>

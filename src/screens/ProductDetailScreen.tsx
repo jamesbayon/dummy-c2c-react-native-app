@@ -1,5 +1,8 @@
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp, NativeStackScreenProps} from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import React from 'react';
 import {
   Image,
@@ -10,10 +13,10 @@ import {
   View,
 } from 'react-native';
 
-import {useFavorites} from '../context/FavoritesContext';
-import {useListings} from '../context/ListingsContext';
-import {users} from '../data/users';
-import type {FavoritesStackParamList, HomeStackParamList} from '../types';
+import { useFavorites } from '../context/FavoritesContext';
+import { useListings } from '../context/ListingsContext';
+import { users } from '../data/users';
+import type { FavoritesStackParamList, HomeStackParamList } from '../types';
 
 type Props =
   | NativeStackScreenProps<HomeStackParamList, 'ProductDetail'>
@@ -23,10 +26,10 @@ type ProductNavigation = NativeStackNavigationProp<
   HomeStackParamList & FavoritesStackParamList
 >;
 
-export function ProductDetailScreen({route}: Props) {
+export function ProductDetailScreen({ route }: Props) {
   const navigation = useNavigation<ProductNavigation>();
-  const {listings} = useListings();
-  const {isFavorite, toggleFavorite} = useFavorites();
+  const { listings } = useListings();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const listing =
     route.params.listing ??
     listings.find(candidate => candidate.id === route.params.listingId);
@@ -43,15 +46,15 @@ export function ProductDetailScreen({route}: Props) {
   const favorite = isFavorite(listing.id);
 
   const openSeller = () => {
-    navigation.navigate('SellerProfile', {sellerId: listing.sellerId});
+    navigation.navigate('SellerProfile', { sellerId: listing.sellerId });
   };
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.imageWrap}>
-        <Image source={{uri: listing.images[0]}} style={styles.image} />
+        <Image source={{ uri: listing.images[0] }} style={styles.image} />
         {listing.isSold ? (
-          <View style={styles.soldBanner}>
+          <View testID="product-sold-banner" style={styles.soldBanner}>
             <Text style={styles.soldBannerText}>SOLD</Text>
           </View>
         ) : null}
@@ -59,7 +62,8 @@ export function ProductDetailScreen({route}: Props) {
           testID="favorite-button"
           accessibilityRole="button"
           onPress={() => toggleFavorite(listing.id)}
-          style={styles.favoriteButton}>
+          style={styles.favoriteButton}
+        >
           <Text style={[styles.heart, favorite && styles.heartActive]}>
             {favorite ? '♥' : '♡'}
           </Text>
@@ -81,13 +85,17 @@ export function ProductDetailScreen({route}: Props) {
         <Text style={styles.description}>{listing.description}</Text>
         {seller ? (
           <TouchableOpacity
+            testID="product-seller-row"
             accessibilityRole="button"
             onPress={openSeller}
-            style={styles.sellerRow}>
-            <Image source={{uri: seller.avatar}} style={styles.avatar} />
+            style={styles.sellerRow}
+          >
+            <Image source={{ uri: seller.avatar }} style={styles.avatar} />
             <View style={styles.sellerText}>
               <Text style={styles.sellerLabel}>Seller</Text>
-              <Text style={styles.sellerName}>{seller.name}</Text>
+              <Text testID="product-seller-name" style={styles.sellerName}>
+                {seller.name}
+              </Text>
             </View>
           </TouchableOpacity>
         ) : null}
@@ -95,7 +103,8 @@ export function ProductDetailScreen({route}: Props) {
           testID="view-seller-button"
           accessibilityRole="button"
           onPress={openSeller}
-          style={styles.sellerButton}>
+          style={styles.sellerButton}
+        >
           <Text style={styles.sellerButtonText}>View Seller Profile</Text>
         </TouchableOpacity>
       </View>
@@ -147,7 +156,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.12,
     shadowRadius: 8,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
   heart: {
