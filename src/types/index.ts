@@ -34,6 +34,7 @@ export type Listing = {
 
 export type RootStackParamList = {
   Login: undefined;
+  Register: undefined;
   MainTabs: undefined;
 };
 

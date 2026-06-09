@@ -1,3 +1,5 @@
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {
   KeyboardAvoidingView,
@@ -10,8 +12,11 @@ import {
 } from 'react-native';
 
 import {useAuth} from '../context/AuthContext';
+import type {RootStackParamList} from '../types';
 
 export function LoginScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {login} = useAuth();
   const [email, setEmail] = useState('user1@test.com');
   const [password, setPassword] = useState('password123');
@@ -66,6 +71,16 @@ export function LoginScreen() {
             Invalid email or password
           </Text>
         ) : null}
+        <TouchableOpacity
+          testID="go-to-register-button"
+          accessibilityRole="button"
+          onPress={() => navigation.navigate('Register')}
+          style={styles.linkButton}>
+          <Text style={styles.linkText}>
+            Don't have an account?{' '}
+            <Text style={styles.linkAccent}>Sign up</Text>
+          </Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -123,5 +138,17 @@ const styles = StyleSheet.create({
     color: '#E33434',
     textAlign: 'center',
     fontSize: 14,
+  },
+  linkButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  linkText: {
+    color: '#555555',
+    fontSize: 15,
+  },
+  linkAccent: {
+    color: '#E33434',
+    fontWeight: '700',
   },
 });
