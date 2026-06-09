@@ -38,8 +38,8 @@ Make sure the following are installed before you start. If you're new to React N
 ### 1. Clone the repository
 
 ```sh
-git clone <your-repo-url>
-cd dummy-c2c-react-native-app
+git clone https://github.com/jamesbayon/dummy-c2c-react-native-app-detox.git
+cd dummy-c2c-react-native-app-detox
 ```
 
 ### 2. Install JavaScript dependencies
