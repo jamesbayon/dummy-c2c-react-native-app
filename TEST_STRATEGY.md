@@ -76,7 +76,8 @@ Design principles:
 
 | Pri    | Feature                     | Business impact                           | Failure likelihood               | Why it ranks here                                                                                      |
 | ------ | --------------------------- | ----------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| **P0** | **Auth: Login / Logout**    | Critical — gate to 100% of authed usage   | Med-High (validation surface)    | If login breaks, the entire app is unusable. Highest impact, must-smoke.                               |
+| **P0** | **Transaction / Payment (buy → pay → payout)** — _NOT IN BUILD_ | Critical — direct money movement, fraud, chargebacks, payouts, PCI/regulatory | High | In a real C2C marketplace this is the **single top P0** (Persona D cross-check below). **Absent in this build** — no buy/checkout/cart/payment/payout exists; "Sell" only creates a listing. Not testable here; tracked in §7 and as skipped placeholders in `e2e/transaction-payment.test.js`. |
+| **P0** | **Auth: Login / Logout**    | Critical — gate to 100% of authed usage   | Med-High (validation surface)    | If login breaks, the entire app is unusable. Highest impact among **implemented** flows.               |
 | **P0** | **Registration**            | Critical — top of acquisition funnel      | High (multi-rule validation)     | No sign-ups → no growth. Rich validation (email format, dup, length, confirm) is defect-prone.         |
 | **P0** | **Create Listing (Sell)**   | Critical — supply side of the marketplace | Med-High (form + state mutation) | A marketplace with no inventory dies. Must validate required fields and that the item enters the feed. |
 | **P1** | **Browse + Search**         | High — demand-side discovery              | Medium (filter + empty state)    | Buyers must find items. Search filtering & empty state are logic that regresses easily.                |
@@ -88,6 +89,30 @@ Design principles:
 
 **Effort allocation:** deepest negative/BVA/EP coverage on **P0**; moderate on
 **P1**; smoke/happy + key state on **P2**.
+
+### 4.1 Persona D cross-check — where payment sits, and other prioritization notes
+
+Reviewed by a **15-year C2C-marketplace QA engineer** against domain reality
+(money movement, fraud, trust).
+
+- **Payment is the top P0 — and it is not part of "Sell."** Listing an item is
+  free; money moves on the **buy** side (buyer pays → platform fee/escrow →
+  seller payout). The buy/checkout/payout path is the highest-risk flow in any
+  real C2C app (double-charge, failed payout, chargebacks, PCI/regulatory
+  exposure) — it ranks **above auth and listing creation**. **This build has no
+  payment, checkout, cart, buy button, or payout**, so it is **out of scope
+  because the feature is absent**, not deprioritized. Surfaced explicitly so the
+  suite isn't read as having ignored the most important flow.
+- **Home-feed load is a P0 smoke.** The listings grid is the first authenticated
+  screen; a blank feed makes the app look dead. Covered today by the
+  marketplace-core "browses seeded listings" test — treated as a P0-level smoke
+  even though search *filtering* logic remains P1.
+- **SOLD-state correctness is a transaction guard in disguise.** Here it is
+  display-only (P1 is correct); in a real app, *blocking purchase of a SOLD item*
+  would be a P0 transaction safeguard.
+- **Seller trust signals:** ratings/reviews would be a **P1 fraud/trust** signal
+  in a real C2C app; this build has only a static bio, so Seller Profiles stay
+  P2.
 
 ---
 
@@ -124,6 +149,7 @@ _(added)_ = `testID` introduced for testability (additive, JS-only, no behavior 
 
 ## 7. Out-of-scope / known limitations (justified)
 
+- **Transaction / Payment / Checkout (buy → pay → seller payout & fees)** — **the canonical #1 P0 of any real C2C marketplace, but entirely absent in this build.** There is no buy button, cart, checkout, payment provider, escrow, or payout — the "Sell" flow is listing creation only (no money changes hands). Nothing to drive, so it cannot be tested here. This is a missing **feature**, not a coverage gap. Encoded as skipped P0 placeholders in `e2e/transaction-payment.test.js` so it is visible in the test report and ready to unskip when a payment flow ships. See the Persona D cross-check (§4.1).
 - **API failure / offline / retry** — no network layer to fault-inject; app is in-memory. N/A.
 - **Push notifications & messaging** — feature not present in this build. N/A.
 - **Location** — not present. N/A.
