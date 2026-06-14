@@ -172,6 +172,7 @@ The suite is risk-based:
 - **P0** protects flows that can block marketplace use or growth: login/logout, registration, and creating a listing.
 - **P1** covers buyer discovery and trust: browse/search, product detail, sold state, and favorites.
 - **P2** covers supporting trust/account/navigation flows: seller profiles, profile display, and bottom tab smoke.
+- **Out of scope (no feature):** a **payment / checkout / buy** flow — the canonical *top* P0 of a real C2C marketplace — does **not exist** in this in-memory build (the "Sell" flow only creates a listing; no money moves). It is documented and tracked as skipped P0 placeholders in `e2e/transaction-payment.test.js` rather than silently omitted. See `TEST_STRATEGY.md` §4.1/§7.
 
 ISTQB techniques used include use-case testing for real journeys, equivalence partitioning for valid/invalid input classes, boundary value analysis around password and price inputs, decision tables for validation-heavy forms, and state-transition testing for login/logout and favorite/unfavorite behavior.
 
